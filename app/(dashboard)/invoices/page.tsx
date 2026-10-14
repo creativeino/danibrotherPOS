@@ -55,11 +55,11 @@ export default async function InvoicesPage() {
   }));
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+    <div className="space-y-4 max-w-[1600px] mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Sales Invoices & Receipts</h1>
-          <p className="text-xs text-slate-500 font-medium">
+          <h1 className="text-xl font-bold tracking-tight text-slate-900">Sales Invoices & Receipts</h1>
+          <p className="text-[11px] text-slate-500 font-medium">
             Manage sales records, reprint thermal slips, edit invoice details, or delete & restock
           </p>
         </div>
