@@ -97,16 +97,16 @@ export function FinancialReportsDashboard({ initialValuation }: Props) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Report Filter & Controls Toolbar */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs space-y-3">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200/90 rounded-xl p-3 shadow-xs space-y-2.5">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
           {/* Quick Period Buttons */}
-          <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200 overflow-x-auto text-xs font-bold">
+          <div className="flex items-center gap-1 p-0.5 bg-slate-100 rounded-lg border border-slate-200 overflow-x-auto text-[11px] font-bold">
             <button
               type="button"
               onClick={() => setPeriod('daily')}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
+              className={`px-2.5 py-1 rounded-md transition cursor-pointer whitespace-nowrap ${
                 period === 'daily'
                   ? 'bg-white text-blue-600 shadow-2xs font-extrabold'
                   : 'text-slate-600 hover:text-slate-900'
@@ -117,18 +117,18 @@ export function FinancialReportsDashboard({ initialValuation }: Props) {
             <button
               type="button"
               onClick={() => setPeriod('yesterday')}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
+              className={`px-2.5 py-1 rounded-md transition cursor-pointer whitespace-nowrap ${
                 period === 'yesterday'
                   ? 'bg-white text-blue-600 shadow-2xs font-extrabold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Yesterday (Previous Day)
+              Yesterday
             </button>
             <button
               type="button"
               onClick={() => setPeriod('weekly')}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
+              className={`px-2.5 py-1 rounded-md transition cursor-pointer whitespace-nowrap ${
                 period === 'weekly'
                   ? 'bg-white text-blue-600 shadow-2xs font-extrabold'
                   : 'text-slate-600 hover:text-slate-900'
@@ -139,7 +139,7 @@ export function FinancialReportsDashboard({ initialValuation }: Props) {
             <button
               type="button"
               onClick={() => setPeriod('monthly')}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
+              className={`px-2.5 py-1 rounded-md transition cursor-pointer whitespace-nowrap ${
                 period === 'monthly'
                   ? 'bg-white text-blue-600 shadow-2xs font-extrabold'
                   : 'text-slate-600 hover:text-slate-900'
@@ -150,7 +150,7 @@ export function FinancialReportsDashboard({ initialValuation }: Props) {
             <button
               type="button"
               onClick={() => setPeriod('lastMonth')}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
+              className={`px-2.5 py-1 rounded-md transition cursor-pointer whitespace-nowrap ${
                 period === 'lastMonth'
                   ? 'bg-white text-blue-600 shadow-2xs font-extrabold'
                   : 'text-slate-600 hover:text-slate-900'
@@ -161,7 +161,7 @@ export function FinancialReportsDashboard({ initialValuation }: Props) {
             <button
               type="button"
               onClick={() => setPeriod('yearly')}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
+              className={`px-2.5 py-1 rounded-md transition cursor-pointer whitespace-nowrap ${
                 period === 'yearly'
                   ? 'bg-white text-blue-600 shadow-2xs font-extrabold'
                   : 'text-slate-600 hover:text-slate-900'
@@ -174,47 +174,47 @@ export function FinancialReportsDashboard({ initialValuation }: Props) {
           {/* Custom Date Range Picker */}
           <form
             onSubmit={handleApplyCustomDates}
-            className="flex flex-wrap sm:flex-nowrap items-center gap-2 text-xs"
+            className="flex flex-wrap sm:flex-nowrap items-center gap-1.5 text-xs"
           >
-            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl shadow-2xs">
-              <span className="text-slate-400 font-semibold">From:</span>
+            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg shadow-2xs">
+              <span className="text-slate-400 font-semibold text-[11px]">From:</span>
               <input
                 type="date"
                 value={fromDate}
                 onChange={e => setFromDate(e.target.value)}
-                className="bg-transparent font-mono text-slate-800 focus:outline-none cursor-pointer"
+                className="bg-transparent font-mono text-slate-800 focus:outline-none cursor-pointer text-xs"
                 required
               />
             </div>
-            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl shadow-2xs">
-              <span className="text-slate-400 font-semibold">To:</span>
+            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg shadow-2xs">
+              <span className="text-slate-400 font-semibold text-[11px]">To:</span>
               <input
                 type="date"
                 value={toDate}
                 onChange={e => setToDate(e.target.value)}
-                className="bg-transparent font-mono text-slate-800 focus:outline-none cursor-pointer"
+                className="bg-transparent font-mono text-slate-800 focus:outline-none cursor-pointer text-xs"
                 required
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold flex items-center gap-1.5 shadow-xs transition cursor-pointer disabled:opacity-50"
+              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold flex items-center gap-1 text-xs shadow-xs transition cursor-pointer disabled:opacity-50"
             >
-              {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Filter className="w-3.5 h-3.5" />}
-              Fetch Dates
+              {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Filter className="w-3 h-3" />}
+              Fetch
             </button>
           </form>
         </div>
 
         {/* Current Period Info Header */}
-        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+          <div className="flex items-center gap-1.5">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span>
             <span className="font-bold text-slate-900">{periodLabels[period]}</span>
           </div>
           {reportData && (
-            <span className="text-slate-400 font-mono text-[11px]">
+            <span className="text-slate-400 font-mono text-[10px]">
               {new Date(reportData.startDate).toLocaleDateString('en-PK')} &rarr;{' '}
               {new Date(reportData.endDate).toLocaleDateString('en-PK')}
             </span>
@@ -222,126 +222,126 @@ export function FinancialReportsDashboard({ initialValuation }: Props) {
         </div>
       </div>
 
-      {/* Main KPI Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Main KPI Stat Cards - Compact */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Net Sales */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs relative overflow-hidden">
+        <div className="bg-white border border-slate-200/90 rounded-xl p-3.5 shadow-xs relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-1 bg-blue-600"></div>
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Net Sales Revenue</span>
-            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
-              <TrendingUp className="w-4 h-4" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Net Sales Revenue</span>
+            <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
+              <TrendingUp className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-3">
-            <p className="text-2xl font-black text-slate-900 font-mono tracking-tight">
+          <div className="mt-2">
+            <p className="text-xl font-black text-slate-900 font-mono tracking-tight leading-none">
               {formatCurrency(summary.netRevenue)}
             </p>
-            <p className="text-[11px] text-slate-400 mt-1 font-medium">
+            <p className="text-[10px] text-slate-400 mt-1 font-medium">
               Gross: {formatCurrency(summary.totalGrossSales)} ({summary.invoicesCount} Invoices)
             </p>
           </div>
         </div>
 
         {/* Cost of Goods Sold */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs relative overflow-hidden">
+        <div className="bg-white border border-slate-200/90 rounded-xl p-3.5 shadow-xs relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-1 bg-amber-500"></div>
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Cost of Goods (COGS)</span>
-            <div className="p-2.5 bg-amber-50 text-amber-600 rounded-xl">
-              <ShoppingBag className="w-4 h-4" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">COGS (Inventory Cost)</span>
+            <div className="p-1.5 bg-amber-50 text-amber-600 rounded-lg">
+              <ShoppingBag className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-3">
-            <p className="text-2xl font-black text-slate-700 font-mono tracking-tight">
+          <div className="mt-2">
+            <p className="text-xl font-black text-slate-700 font-mono tracking-tight leading-none">
               {formatCurrency(summary.totalCogs)}
             </p>
-            <p className="text-[11px] text-slate-400 mt-1 font-medium">
-              Inventory acquisition cost
+            <p className="text-[10px] text-slate-400 mt-1 font-medium">
+              Stock acquisition cost
             </p>
           </div>
         </div>
 
         {/* Gross Profit */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs relative overflow-hidden">
+        <div className="bg-white border border-slate-200/90 rounded-xl p-3.5 shadow-xs relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500"></div>
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Gross Profit</span>
-            <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl">
-              <DollarSign className="w-4 h-4" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Gross Profit</span>
+            <div className="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg">
+              <DollarSign className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-3">
-            <p className="text-2xl font-black text-emerald-600 font-mono tracking-tight">
+          <div className="mt-2">
+            <p className="text-xl font-black text-emerald-600 font-mono tracking-tight leading-none">
               {formatCurrency(summary.grossProfit)}
             </p>
-            <p className="text-[11px] text-emerald-700 font-semibold mt-1">
+            <p className="text-[10px] text-emerald-700 font-semibold mt-1">
               Margin: {summary.grossProfitMargin}% of revenue
             </p>
           </div>
         </div>
 
         {/* Net Profit (After Expenses) */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-xs relative overflow-hidden">
+        <div className="bg-white border border-slate-200/90 rounded-xl p-3.5 shadow-xs relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-1 bg-indigo-600"></div>
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Net Profit</span>
-            <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl">
-              <TrendingUp className="w-4 h-4" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Net Profit</span>
+            <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
+              <TrendingUp className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="mt-3">
-            <p className="text-2xl font-black text-indigo-600 font-mono tracking-tight">
+          <div className="mt-2">
+            <p className="text-xl font-black text-indigo-600 font-mono tracking-tight leading-none">
               {formatCurrency(summary.netProfit)}
             </p>
-            <p className="text-[11px] text-slate-400 mt-1 font-medium">
-              After {formatCurrency(summary.totalExpenses)} shop expenses
+            <p className="text-[10px] text-slate-400 mt-1 font-medium">
+              After {formatCurrency(summary.totalExpenses)} expenses
             </p>
           </div>
         </div>
       </div>
 
-      {/* Secondary Performance Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Secondary Performance Cards - Compact */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Customer Returns & Refunds */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs">
+        <div className="bg-white border border-slate-200/90 rounded-xl p-3 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Customer Returns (RMA)</span>
-            <RotateCcw className="w-4 h-4 text-rose-500" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Customer Returns (RMA)</span>
+            <RotateCcw className="w-3.5 h-3.5 text-rose-500" />
           </div>
-          <p className="text-xl font-black text-rose-600 font-mono mt-2">
+          <p className="text-lg font-black text-rose-600 font-mono mt-1.5 leading-tight">
             {formatCurrency(summary.totalSalesReturns)}
           </p>
-          <p className="text-[11px] text-slate-400 mt-1">
+          <p className="text-[10px] text-slate-400 mt-0.5">
             {summary.salesReturnsCount || 0} returned sales recorded
           </p>
         </div>
 
         {/* Purchases From Suppliers */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs">
+        <div className="bg-white border border-slate-200/90 rounded-xl p-3 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Supplier Purchases</span>
-            <Building className="w-4 h-4 text-purple-600" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Supplier Purchases</span>
+            <Building className="w-3.5 h-3.5 text-purple-600" />
           </div>
-          <p className="text-xl font-black text-purple-700 font-mono mt-2">
+          <p className="text-lg font-black text-purple-700 font-mono mt-1.5 leading-tight">
             {formatCurrency(summary.totalPurchases)}
           </p>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Vendor bills in this period
+          <p className="text-[10px] text-slate-400 mt-0.5">
+            Vendor purchases in this period
           </p>
         </div>
 
         {/* Operating Shop Expenses */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs">
+        <div className="bg-white border border-slate-200/90 rounded-xl p-3 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Shop Expenses</span>
-            <Receipt className="w-4 h-4 text-slate-500" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Shop Expenses</span>
+            <Receipt className="w-3.5 h-3.5 text-slate-500" />
           </div>
-          <p className="text-xl font-black text-slate-900 font-mono mt-2">
+          <p className="text-lg font-black text-slate-900 font-mono mt-1.5 leading-tight">
             {formatCurrency(summary.totalExpenses)}
           </p>
-          <p className="text-[11px] text-slate-400 mt-1">
-            {summary.expensesCount || 0} bills & maintenance expenses
+          <p className="text-[10px] text-slate-400 mt-0.5">
+            {summary.expensesCount || 0} recorded expenses
           </p>
         </div>
       </div>
