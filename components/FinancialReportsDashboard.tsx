@@ -24,7 +24,9 @@ interface Props {
 }
 
 export function FinancialReportsDashboard({ initialValuation }: Props) {
-  const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom'>('daily');
+  const [period, setPeriod] = useState<
+    'daily' | 'yesterday' | 'weekly' | 'lastWeek' | 'monthly' | 'lastMonth' | 'yearly' | 'lastYear' | 'custom'
+  >('daily');
   const [fromDate, setFromDate] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() - 7);
@@ -83,11 +85,15 @@ export function FinancialReportsDashboard({ initialValuation }: Props) {
   };
 
   const periodLabels: Record<string, string> = {
-    daily: "Today's Financial Performance",
-    weekly: 'Last 7 Days Financial Performance',
-    monthly: 'This Month Financial Performance',
-    yearly: 'This Year Financial Performance',
-    custom: `Custom Range (${fromDate} to ${toDate})`,
+    daily: "Today's Performance (Daily)",
+    yesterday: "Yesterday's Performance (Previous Day)",
+    weekly: 'Last 7 Days (Weekly)',
+    lastWeek: 'Previous Week Performance',
+    monthly: 'This Month (Current)',
+    lastMonth: 'Last Month (Previous Month)',
+    yearly: 'This Year (Year to Date)',
+    lastYear: 'Previous Year (Full Year)',
+    custom: `Custom Selected Dates (${fromDate} to ${toDate})`,
   };
 
   return (
@@ -95,51 +101,73 @@ export function FinancialReportsDashboard({ initialValuation }: Props) {
       {/* Report Filter & Controls Toolbar */}
       <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs space-y-3">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          {/* Quick Period Buttons: Daily, Weekly, Monthly, Yearly */}
+          {/* Quick Period Buttons */}
           <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200 overflow-x-auto text-xs font-bold">
             <button
               type="button"
               onClick={() => setPeriod('daily')}
-              className={`px-3.5 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
                 period === 'daily'
                   ? 'bg-white text-blue-600 shadow-2xs font-extrabold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Daily (Today)
+              Today
+            </button>
+            <button
+              type="button"
+              onClick={() => setPeriod('yesterday')}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
+                period === 'yesterday'
+                  ? 'bg-white text-blue-600 shadow-2xs font-extrabold'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Yesterday (Previous Day)
             </button>
             <button
               type="button"
               onClick={() => setPeriod('weekly')}
-              className={`px-3.5 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
                 period === 'weekly'
                   ? 'bg-white text-blue-600 shadow-2xs font-extrabold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Weekly (7 Days)
+              Last 7 Days
             </button>
             <button
               type="button"
               onClick={() => setPeriod('monthly')}
-              className={`px-3.5 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
                 period === 'monthly'
                   ? 'bg-white text-blue-600 shadow-2xs font-extrabold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Monthly (This Month)
+              This Month
+            </button>
+            <button
+              type="button"
+              onClick={() => setPeriod('lastMonth')}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
+                period === 'lastMonth'
+                  ? 'bg-white text-blue-600 shadow-2xs font-extrabold'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Last Month
             </button>
             <button
               type="button"
               onClick={() => setPeriod('yearly')}
-              className={`px-3.5 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer whitespace-nowrap ${
                 period === 'yearly'
                   ? 'bg-white text-blue-600 shadow-2xs font-extrabold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Yearly (This Year)
+              Yearly
             </button>
           </div>
 
@@ -174,7 +202,7 @@ export function FinancialReportsDashboard({ initialValuation }: Props) {
               className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold flex items-center gap-1.5 shadow-xs transition cursor-pointer disabled:opacity-50"
             >
               {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Filter className="w-3.5 h-3.5" />}
-              Filter Dates
+              Fetch Dates
             </button>
           </form>
         </div>

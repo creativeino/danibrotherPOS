@@ -19,19 +19,38 @@ export async function GET(req: NextRequest) {
     if (period === 'daily') {
       startDate.setHours(0, 0, 0, 0);
       endDate.setHours(23, 59, 59, 999);
+    } else if (period === 'yesterday') {
+      startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      startDate.setHours(0, 0, 0, 0);
+      endDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      endDate.setHours(23, 59, 59, 999);
     } else if (period === 'weekly') {
       // Last 7 days
       startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       startDate.setHours(0, 0, 0, 0);
       endDate.setHours(23, 59, 59, 999);
+    } else if (period === 'lastWeek') {
+      // Previous 7 days
+      startDate = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+      startDate.setHours(0, 0, 0, 0);
+      endDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      endDate.setHours(23, 59, 59, 999);
     } else if (period === 'monthly') {
-      // Current month or last 30 days
+      // Current month
       startDate = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
       endDate.setHours(23, 59, 59, 999);
+    } else if (period === 'lastMonth') {
+      // Previous month
+      startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
+      endDate = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
     } else if (period === 'yearly') {
       // Current year
       startDate = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
       endDate.setHours(23, 59, 59, 999);
+    } else if (period === 'lastYear') {
+      // Previous year
+      startDate = new Date(now.getFullYear() - 1, 0, 1, 0, 0, 0, 0);
+      endDate = new Date(now.getFullYear() - 1, 11, 31, 23, 59, 59, 999);
     } else if (period === 'custom') {
       if (fromParam) {
         startDate = new Date(fromParam);
