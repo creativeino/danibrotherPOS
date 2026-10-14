@@ -7,6 +7,7 @@ export const revalidate = 0;
 
 export default async function ProductsPage() {
   const products = await prisma.product.findMany({
+    where: { active: true },
     include: {
       brand: true,
       category: true,
