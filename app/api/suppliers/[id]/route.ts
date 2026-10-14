@@ -62,9 +62,20 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 export async function DELETE(req: NextRequest, { params }: Params) {
   try {
     const resolved = await Promise.resolve(params);
-    await prisma.supplier.delete({
-      where: { id: resolved.id },
-    });
+
+    // Delete related ledger entries and advances first to avoid foreign key violation
+    await prisma.$transaction([
+      prisma.supplierLedgerEntry.deleteMany({
+        where: { supplierId: resolved.id },
+      }),
+      prisma.supplierAdvance.deleteMany({
+        where: { supplierId: resolved.id },
+      }),
+      prisma.supplier.delete({
+        where: { id: resolved.id },
+      }),
+    ]);
+
     return NextResponse.json({ success: true, message: 'Supplier deleted successfully' });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
