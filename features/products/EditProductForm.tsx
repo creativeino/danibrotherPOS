@@ -234,8 +234,7 @@ export function EditProductForm({ product, categories, brands, suppliers }: Prop
       setSuccessMsg(`Product "${name}" updated successfully!`);
       setTimeout(() => {
         router.push('/products');
-        router.refresh();
-      }, 1000);
+      }, 700);
     } catch {
       setErrorMsg('Network error while saving changes.');
       setLoading(false);

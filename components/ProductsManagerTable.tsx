@@ -81,9 +81,6 @@ export function ProductsManagerTable({ initialProducts }: Props) {
 
       setProducts(prev => prev.filter(p => p.id !== deleteTarget.id));
       setDeleteTarget(null);
-      startTransition(() => {
-        router.refresh();
-      });
     } catch (err: any) {
       setDeleteError(err.message || 'Error deleting product');
     } finally {
