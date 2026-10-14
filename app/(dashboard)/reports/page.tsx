@@ -1,11 +1,15 @@
 import React from 'react';
 import { ReportService } from '@/services/report-service';
 import { formatCurrency } from '@/lib/calculations';
-import { BarChart3, TrendingUp, Package, DollarSign, Download } from 'lucide-react';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function ReportsPage() {
-  const valuation = ReportService.getInventoryValuation();
-  const metrics = ReportService.getDashboardMetrics();
+  const [valuation, metrics] = await Promise.all([
+    ReportService.getInventoryValuation(),
+    ReportService.getDashboardMetrics(),
+  ]);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -58,20 +62,26 @@ export default async function ReportsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
-              {valuation.map(v => (
-                <tr key={v.id} className="hover:bg-slate-50/70 transition">
-                  <td className="p-3.5 font-mono text-blue-600 font-bold">{v.sku}</td>
-                  <td className="p-3.5 font-bold text-slate-900 max-w-xs truncate">{v.name}</td>
-                  <td className="p-3.5 text-center font-bold font-mono text-slate-900">{v.quantity}</td>
-                  <td className="p-3.5 text-right font-mono text-slate-500">{formatCurrency(v.unitCost)}</td>
-                  <td className="p-3.5 text-right font-mono text-slate-700">{formatCurrency(v.unitPrice)}</td>
-                  <td className="p-3.5 text-right font-mono font-semibold text-slate-900">{formatCurrency(v.costValue)}</td>
-                  <td className="p-3.5 text-right font-mono font-semibold text-slate-900">{formatCurrency(v.retailValue)}</td>
-                  <td className="p-3.5 text-right font-mono font-bold text-emerald-700">
-                    {formatCurrency(v.potentialProfit)}
+              {valuation.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="p-8 text-center text-slate-400 font-medium">
+                    No physical inventory items found.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                valuation.map(item => (
+                  <tr key={item.id} className="hover:bg-slate-50/70 transition">
+                    <td className="p-3.5 font-mono text-blue-600 font-bold">{item.sku}</td>
+                    <td className="p-3.5 font-bold text-slate-900">{item.name}</td>
+                    <td className="p-3.5 text-center font-mono font-bold text-slate-800">{item.quantity}</td>
+                    <td className="p-3.5 text-right font-mono text-slate-600">{formatCurrency(item.unitCost)}</td>
+                    <td className="p-3.5 text-right font-mono text-slate-900">{formatCurrency(item.unitPrice)}</td>
+                    <td className="p-3.5 text-right font-mono font-bold text-slate-700">{formatCurrency(item.costValue)}</td>
+                    <td className="p-3.5 text-right font-mono font-bold text-slate-900">{formatCurrency(item.retailValue)}</td>
+                    <td className="p-3.5 text-right font-mono font-black text-emerald-600">{formatCurrency(item.potentialProfit)}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

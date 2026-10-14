@@ -14,8 +14,11 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function DashboardPage() {
-  const metrics = ReportService.getDashboardMetrics();
+  const metrics = await ReportService.getDashboardMetrics();
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
