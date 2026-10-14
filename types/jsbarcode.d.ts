@@ -1,0 +1,27 @@
+declare module 'jsbarcode' {
+  export default function JsBarcode(
+    element: string | HTMLElement | SVGSVGElement | HTMLCanvasElement,
+    text: string,
+    options?: {
+      format?: string;
+      width?: number;
+      height?: number;
+      displayValue?: boolean;
+      text?: string;
+      fontOptions?: string;
+      font?: string;
+      textAlign?: string;
+      textPosition?: string;
+      textMargin?: number;
+      fontSize?: number;
+      background?: string;
+      lineColor?: string;
+      margin?: number;
+      marginTop?: number;
+      marginBottom?: number;
+      marginLeft?: number;
+      marginRight?: number;
+      valid?: (valid: boolean) => void;
+    }
+  ): void;
+}
