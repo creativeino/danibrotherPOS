@@ -26,7 +26,15 @@ export default async function InvoicePrintPage({
     // fallback
   }
 
-  const invoice = POSService.getInvoice(id);
+  let invoice = id ? POSService.getInvoice(id) : null;
+  if (!invoice) {
+    const allSales = [...(dbStore.getState().sales || [])];
+    const latest = allSales[allSales.length - 1];
+    if (latest) {
+      invoice = POSService.getInvoice(latest.id);
+    }
+  }
+
   const settings = dbStore.getState().settings;
   const noAutoPrint = resolvedSearchParams?.autoprint === 'false';
   const sizeParam = resolvedSearchParams?.size === '80mm' ? '80mm' : '58mm'; // Default to compact 58mm POS thermal receipt
