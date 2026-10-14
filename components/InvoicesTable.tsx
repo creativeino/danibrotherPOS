@@ -118,9 +118,34 @@ export function InvoicesTable({ invoices: initialInvoices }: Props) {
     }
   };
 
+  const [filterQuery, setFilterQuery] = useState('');
+
+  const filteredInvoices = invoices.filter(
+    inv =>
+      inv.invoiceNumber.toLowerCase().includes(filterQuery.toLowerCase()) ||
+      inv.customerName.toLowerCase().includes(filterQuery.toLowerCase()) ||
+      inv.cashierName.toLowerCase().includes(filterQuery.toLowerCase())
+  );
+
   return (
     <>
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+      <div className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs">
+        {/* Search & Filter Header */}
+        <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50/50">
+          <div className="w-full sm:w-80">
+            <input
+              type="text"
+              placeholder="Search invoice #, customer or staff..."
+              value={filterQuery}
+              onChange={e => setFilterQuery(e.target.value)}
+              className="w-full bg-white border border-slate-200 focus:border-blue-600 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 transition shadow-2xs"
+            />
+          </div>
+          <div className="text-xs font-semibold text-slate-500">
+            Showing <span className="font-bold text-slate-800">{filteredInvoices.length}</span> of {invoices.length} invoices
+          </div>
+        </div>
+
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50/80 text-slate-500 border-b border-slate-200 uppercase font-bold text-[10px] tracking-wider">
@@ -137,17 +162,17 @@ export function InvoicesTable({ invoices: initialInvoices }: Props) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
-              {invoices.length === 0 ? (
+              {filteredInvoices.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="p-8 text-center text-slate-400 font-medium">
-                    No sales invoices found.
+                  <td colSpan={9} className="p-10 text-center text-slate-400 font-medium">
+                    No matching sales invoices found.
                   </td>
                 </tr>
               ) : (
-                invoices.map(s => (
-                  <tr key={s.id} className="hover:bg-slate-50/70 transition">
+                filteredInvoices.map(s => (
+                  <tr key={s.id} className="hover:bg-blue-50/30 transition-colors">
                     <td className="p-3.5 font-mono text-blue-600 font-bold">{s.invoiceNumber}</td>
-                    <td className="p-3.5 text-slate-500 font-mono">
+                    <td className="p-3.5 text-slate-500 font-mono text-[11px]">
                       {new Date(s.invoiceDate).toLocaleString('en-PK')}
                     </td>
                     <td className="p-3.5 font-bold text-slate-900">{s.customerName}</td>
@@ -163,10 +188,10 @@ export function InvoicesTable({ invoices: initialInvoices }: Props) {
                     </td>
                     <td className="p-3.5 text-center">
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                           s.paymentStatus === 'PAID'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : 'bg-amber-50 text-amber-700 border border-amber-200'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80'
+                            : 'bg-amber-50 text-amber-700 border border-amber-200/80'
                         }`}
                       >
                         {s.paymentMethod} &bull; {s.paymentStatus}
@@ -179,7 +204,7 @@ export function InvoicesTable({ invoices: initialInvoices }: Props) {
                           target="_blank"
                           rel="noopener noreferrer"
                           title="Print Thermal Slip"
-                          className="px-2 py-1 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold inline-flex items-center gap-1 shadow-2xs transition cursor-pointer"
+                          className="px-2.5 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-semibold inline-flex items-center gap-1 shadow-2xs transition cursor-pointer"
                         >
                           <Printer className="w-3.5 h-3.5 text-blue-600" /> Print
                         </a>
