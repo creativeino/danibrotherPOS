@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { InvoicesTable } from '@/components/InvoicesTable';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function InvoicesPage() {
   const rawSales = await prisma.salesInvoice.findMany({
