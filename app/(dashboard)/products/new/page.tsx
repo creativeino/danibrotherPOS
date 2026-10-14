@@ -1,16 +1,26 @@
 import React from 'react';
-import { dbStore } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { NewProductForm } from '@/features/products/NewProductForm';
 
-export default async function NewProductPage() {
-  const state = dbStore.getState();
-  const categories = state.categories.map(c => ({ id: c.id, name: c.name }));
-  const brands = state.brands.map(b => ({ id: b.id, name: b.name }));
-  const suppliers = (state.suppliers || []).map(s => ({
-    id: s.id,
-    name: s.name,
-    companyName: s.companyName,
-  }));
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
-  return <NewProductForm categories={categories} brands={brands} suppliers={suppliers} />;
+export default async function NewProductPage() {
+  const [categories, brands, suppliers] = await Promise.all([
+    prisma.category.findMany({ orderBy: { name: 'asc' } }),
+    prisma.brand.findMany({ orderBy: { name: 'asc' } }),
+    prisma.supplier.findMany({ orderBy: { name: 'asc' } }),
+  ]);
+
+  return (
+    <NewProductForm
+      categories={categories.map(c => ({ id: c.id, name: c.name }))}
+      brands={brands.map(b => ({ id: b.id, name: b.name }))}
+      suppliers={suppliers.map(s => ({
+        id: s.id,
+        name: s.name,
+        companyName: s.companyName,
+      }))}
+    />
+  );
 }

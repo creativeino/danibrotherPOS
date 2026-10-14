@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { dbStore } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function GET() {
   try {
-    const state = dbStore.getState();
-    return NextResponse.json({ success: true, brands: state.brands || [] });
+    const brands = await prisma.brand.findMany({
+      orderBy: { name: 'asc' },
+    });
+    return NextResponse.json({ success: true, brands });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
@@ -25,15 +27,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const state = dbStore.getState();
-    if (!state.brands) {
-      state.brands = [];
-    }
+    const existing = await prisma.brand.findFirst({
+      where: { name: { equals: name, mode: 'insensitive' } },
+    });
 
-    // Check duplicate brand
-    const existing = state.brands.find(
-      b => b.name.toLowerCase().trim() === name.toLowerCase()
-    );
     if (existing) {
       return NextResponse.json({
         success: true,
@@ -42,25 +39,26 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const newBrand = {
-      id: `br-${Date.now()}`,
-      name,
-      createdAt: new Date().toISOString(),
-    };
-
-    state.brands.push(newBrand);
-
-    state.auditLogs.push({
-      id: `aud-${Date.now()}`,
-      userId,
-      action: 'BRAND_CREATED',
-      entityType: 'Brand',
-      entityId: newBrand.id,
-      details: JSON.stringify(newBrand),
-      createdAt: new Date().toISOString(),
+    const newBrand = await prisma.brand.create({
+      data: {
+        name,
+        description: body.description || null,
+      },
     });
 
-    dbStore.save(state);
+    try {
+      await prisma.auditLog.create({
+        data: {
+          userId,
+          action: 'BRAND_CREATED',
+          entityType: 'Brand',
+          entityId: newBrand.id,
+          details: JSON.stringify(newBrand),
+        },
+      });
+    } catch {
+      // audit log optional
+    }
 
     return NextResponse.json({ success: true, brand: newBrand });
   } catch (error: any) {

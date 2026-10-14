@@ -1,44 +1,68 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AccountService } from '@/services/account-service';
+import { prisma } from '@/lib/prisma';
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
-) {
+type Params = { params: Promise<{ id: string }> | { id: string } };
+
+export async function GET(req: NextRequest, { params }: Params) {
   try {
     const resolved = await Promise.resolve(params);
-    const suppliers = AccountService.getSuppliers();
-    const supplier = suppliers.find(s => s.id === resolved.id);
+    const supplier = await prisma.supplier.findUnique({
+      where: { id: resolved.id },
+    });
     if (!supplier) {
       return NextResponse.json({ success: false, error: 'Supplier not found' }, { status: 404 });
     }
-    return NextResponse.json({ success: true, supplier });
+    return NextResponse.json({
+      success: true,
+      supplier: {
+        ...supplier,
+        openingBalance: Number(supplier.openingBalance),
+        advanceBalance: Number(supplier.advanceBalance),
+        outstandingBalance: Number(supplier.outstandingBalance),
+      },
+    });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
-) {
+export async function PATCH(req: NextRequest, { params }: Params) {
   try {
     const resolved = await Promise.resolve(params);
     const body = await req.json();
-    const updated = AccountService.updateSupplier(resolved.id, body);
-    return NextResponse.json({ success: true, supplier: updated });
+
+    const updateData: any = { updatedAt: new Date() };
+    if (body.name !== undefined) updateData.name = body.name.trim();
+    if (body.companyName !== undefined) updateData.companyName = body.companyName?.trim() || null;
+    if (body.phone !== undefined) updateData.phone = body.phone?.trim() || null;
+    if (body.email !== undefined) updateData.email = body.email?.trim() || null;
+    if (body.address !== undefined) updateData.address = body.address?.trim() || null;
+
+    const updated = await prisma.supplier.update({
+      where: { id: resolved.id },
+      data: updateData,
+    });
+
+    return NextResponse.json({
+      success: true,
+      supplier: {
+        ...updated,
+        openingBalance: Number(updated.openingBalance),
+        advanceBalance: Number(updated.advanceBalance),
+        outstandingBalance: Number(updated.outstandingBalance),
+      },
+    });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
-) {
+export async function DELETE(req: NextRequest, { params }: Params) {
   try {
     const resolved = await Promise.resolve(params);
-    AccountService.deleteSupplier(resolved.id);
+    await prisma.supplier.delete({
+      where: { id: resolved.id },
+    });
     return NextResponse.json({ success: true, message: 'Supplier deleted successfully' });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });

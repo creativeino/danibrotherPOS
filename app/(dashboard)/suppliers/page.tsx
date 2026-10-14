@@ -1,13 +1,30 @@
 import React from 'react';
-import { AccountService } from '@/services/account-service';
+import { prisma } from '@/lib/prisma';
 import { NewSupplierModal } from '@/components/NewSupplierModal';
 import { PaySupplierModal } from '@/components/PaySupplierModal';
 import { SuppliersManagerTable } from '@/components/SuppliersManagerTable';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function SuppliersPage() {
-  const suppliers = AccountService.getSuppliers();
+  const rawSuppliers = await prisma.supplier.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
+
+  const suppliers = rawSuppliers.map(s => ({
+    id: s.id,
+    supplierNumber: s.supplierNumber,
+    name: s.name,
+    companyName: s.companyName,
+    phone: s.phone,
+    email: s.email,
+    address: s.address,
+    openingBalance: Number(s.openingBalance),
+    advanceBalance: Number(s.advanceBalance),
+    outstandingBalance: Number(s.outstandingBalance),
+    createdAt: s.createdAt.toISOString(),
+  }));
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -27,8 +44,7 @@ export default async function SuppliersPage() {
         </div>
       </div>
 
-      <SuppliersManagerTable initialSuppliers={suppliers} />
+      <SuppliersManagerTable initialSuppliers={suppliers as any} />
     </div>
   );
 }
-
