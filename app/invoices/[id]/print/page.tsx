@@ -204,11 +204,8 @@ export default async function InvoicePrintPage({
           <img
             src="/logodanibro.svg"
             alt="Danibrothers"
-            className="h-9 w-auto max-w-[135px] mx-auto object-contain block mb-1.5 filter grayscale contrast-200"
+            className="h-10 w-auto max-w-[140px] mx-auto object-contain block mb-1.5 filter grayscale contrast-200"
           />
-          <h1 className="text-[11px] font-black tracking-wider uppercase text-black">
-            Danibrothers Computers & CCTV
-          </h1>
           <p className="text-[9px] leading-tight text-black mt-1 font-semibold">{settings.address}</p>
           <p className="text-[9.5px] font-black text-black mt-0.5">Contact: {settings.phone}</p>
           {settings.email && (
