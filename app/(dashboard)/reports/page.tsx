@@ -1,91 +1,26 @@
 import React from 'react';
 import { ReportService } from '@/services/report-service';
-import { formatCurrency } from '@/lib/calculations';
+import { FinancialReportsDashboard } from '@/components/FinancialReportsDashboard';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function ReportsPage() {
-  const [valuation, metrics] = await Promise.all([
-    ReportService.getInventoryValuation(),
-    ReportService.getDashboardMetrics(),
-  ]);
+  const valuation = await ReportService.getInventoryValuation();
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+    <div className="space-y-4 max-w-[1600px] mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Financial & Inventory Reports</h1>
-          <p className="text-xs text-slate-500 font-medium">
-            Audit-ready gross profit statements, cost valuation, and stock profitability
+          <h1 className="text-xl font-bold tracking-tight text-slate-900">Financial & Performance Reports</h1>
+          <p className="text-[11px] text-slate-500 font-medium">
+            Daily, Weekly, Monthly, Yearly and Custom Date Range P&L, COGS, Net Profit, and Inventory Valuation
           </p>
         </div>
       </div>
 
-      {/* Financial Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
-          <span className="text-xs uppercase text-slate-500 font-bold tracking-wider">Total Invoiced Revenue</span>
-          <p className="text-2xl font-black text-slate-900 mt-2 font-mono">{formatCurrency(metrics.totalSales)}</p>
-        </div>
-
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
-          <span className="text-xs uppercase text-slate-500 font-bold tracking-wider">Recorded Cost of Goods Sold (COGS)</span>
-          <p className="text-2xl font-black text-slate-700 mt-2 font-mono">{formatCurrency(metrics.totalCogs)}</p>
-        </div>
-
-        <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
-          <span className="text-xs uppercase text-emerald-700 font-bold tracking-wider">Gross Profit (Real COGS)</span>
-          <p className="text-2xl font-black text-emerald-600 mt-2 font-mono">{formatCurrency(metrics.grossProfit)}</p>
-        </div>
-      </div>
-
-      {/* Inventory Valuation & Potential Profit Table */}
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
-        <div className="p-4 border-b border-slate-200 bg-white flex justify-between items-center">
-          <h2 className="font-bold text-sm text-slate-900">Live Inventory Valuation by Product</h2>
-          <span className="text-xs text-slate-500 font-medium">Cost value vs Expected retail margin</span>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50/80 text-slate-500 border-b border-slate-200 uppercase font-bold text-[10px] tracking-wider">
-              <tr>
-                <th className="p-3.5">SKU</th>
-                <th className="p-3.5">Product Name</th>
-                <th className="p-3.5 text-center">On Hand</th>
-                <th className="p-3.5 text-right">Unit Cost</th>
-                <th className="p-3.5 text-right">Selling Price</th>
-                <th className="p-3.5 text-right">Total Cost Value</th>
-                <th className="p-3.5 text-right">Total Retail Value</th>
-                <th className="p-3.5 text-right">Expected Margin</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
-              {valuation.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="p-8 text-center text-slate-400 font-medium">
-                    No physical inventory items found.
-                  </td>
-                </tr>
-              ) : (
-                valuation.map(item => (
-                  <tr key={item.id} className="hover:bg-slate-50/70 transition">
-                    <td className="p-3.5 font-mono text-blue-600 font-bold">{item.sku}</td>
-                    <td className="p-3.5 font-bold text-slate-900">{item.name}</td>
-                    <td className="p-3.5 text-center font-mono font-bold text-slate-800">{item.quantity}</td>
-                    <td className="p-3.5 text-right font-mono text-slate-600">{formatCurrency(item.unitCost)}</td>
-                    <td className="p-3.5 text-right font-mono text-slate-900">{formatCurrency(item.unitPrice)}</td>
-                    <td className="p-3.5 text-right font-mono font-bold text-slate-700">{formatCurrency(item.costValue)}</td>
-                    <td className="p-3.5 text-right font-mono font-bold text-slate-900">{formatCurrency(item.retailValue)}</td>
-                    <td className="p-3.5 text-right font-mono font-black text-emerald-600">{formatCurrency(item.potentialProfit)}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <FinancialReportsDashboard initialValuation={valuation} />
     </div>
   );
 }
+
