@@ -29,10 +29,10 @@ interface PurchaseInvoiceOption {
 interface Props {
   suppliers: SupplierOption[];
   products: ProductOption[];
-  purchaseInvoices: PurchaseInvoiceOption[];
+  purchaseInvoices?: PurchaseInvoiceOption[];
 }
 
-export function NewPurchaseReturnModal({ suppliers, products, purchaseInvoices }: Props) {
+export function NewPurchaseReturnModal({ suppliers, products, purchaseInvoices = [] }: Props) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);

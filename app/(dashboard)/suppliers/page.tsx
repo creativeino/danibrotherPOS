@@ -2,15 +2,30 @@ import React from 'react';
 import { prisma } from '@/lib/prisma';
 import { NewSupplierModal } from '@/components/NewSupplierModal';
 import { PaySupplierModal } from '@/components/PaySupplierModal';
+import { NewPurchaseReturnModal } from '@/components/NewPurchaseReturnModal';
 import { SuppliersManagerTable } from '@/components/SuppliersManagerTable';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function SuppliersPage() {
-  const rawSuppliers = await prisma.supplier.findMany({
-    orderBy: { createdAt: 'desc' },
-  });
+  const [rawSuppliers, rawProducts] = await Promise.all([
+    prisma.supplier.findMany({
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.product.findMany({
+      where: { active: true },
+      orderBy: { name: 'asc' },
+    }),
+  ]);
+
+  const products = rawProducts.map(p => ({
+    id: p.id,
+    name: p.name,
+    sku: p.sku,
+    costPrice: Number(p.costPrice),
+    quantityInStock: p.quantityInStock,
+  }));
 
   const suppliers = rawSuppliers.map(s => ({
     id: s.id,
@@ -36,6 +51,21 @@ export default async function SuppliersPage() {
           </p>
         </div>
         <div className="flex items-center gap-2.5">
+          <NewPurchaseReturnModal
+            suppliers={suppliers.map(s => ({
+              id: s.id,
+              name: s.name,
+              companyName: s.companyName,
+              outstandingBalance: s.outstandingBalance,
+            }))}
+            products={products.map(p => ({
+              id: p.id,
+              name: p.name,
+              sku: p.sku,
+              costPrice: Number(p.costPrice),
+              quantityInStock: p.quantityInStock,
+            }))}
+          />
           <PaySupplierModal
             allSuppliers={suppliers.map(s => ({ id: s.id, name: s.name, outstandingBalance: s.outstandingBalance }))}
             buttonLabel="Pay Supplier Bill"

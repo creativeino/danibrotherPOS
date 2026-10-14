@@ -50,8 +50,7 @@ export function Sidebar({ currentUser }: SidebarProps) {
     {
       title: 'Accounts & Ledgers',
       items: [
-        { label: 'Purchases (Inward)', href: '/purchases', icon: Truck },
-        { label: 'Purchase Returns', href: '/purchase-returns', icon: RotateCcw },
+        { label: 'Purchase Returns (Vendor)', href: '/purchase-returns', icon: RotateCcw },
         { label: 'Suppliers & Vendors', href: '/suppliers', icon: Building2 },
       ],
     },
