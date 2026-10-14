@@ -37,6 +37,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     if (body.phone !== undefined) updateData.phone = body.phone?.trim() || null;
     if (body.email !== undefined) updateData.email = body.email?.trim() || null;
     if (body.address !== undefined) updateData.address = body.address?.trim() || null;
+    if (body.outstandingBalance !== undefined) updateData.outstandingBalance = Number(body.outstandingBalance) || 0;
+    if (body.openingBalance !== undefined) updateData.openingBalance = Number(body.openingBalance) || 0;
 
     const updated = await prisma.supplier.update({
       where: { id: resolved.id },

@@ -1,13 +1,14 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { AccountService } from '@/services/account-service';
+import { prisma } from '@/lib/prisma';
 import { formatCurrency } from '@/lib/calculations';
 import { ArrowLeft, Building2, Phone, Mail, MapPin } from 'lucide-react';
 import { PrintButton } from '@/components/PrintButton';
 import { PaySupplierModal } from '@/components/PaySupplierModal';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 interface Props {
   params: Promise<{ id: string }> | { id: string };
@@ -15,14 +16,36 @@ interface Props {
 
 export default async function SupplierLedgerPage({ params }: Props) {
   const resolvedParams = await Promise.resolve(params);
-  const suppliers = AccountService.getSuppliers();
-  const supplier = suppliers.find(s => s.id === resolvedParams.id);
+
+  const supplier = await prisma.supplier.findUnique({
+    where: { id: resolvedParams.id },
+    include: {
+      ledgerEntries: {
+        orderBy: { entryDate: 'desc' },
+      },
+    },
+  });
 
   if (!supplier) {
     notFound();
   }
 
-  const ledger = AccountService.getSupplierLedger(supplier.id);
+  const mappedSupplier = {
+    ...supplier,
+    openingBalance: Number(supplier.openingBalance),
+    advanceBalance: Number(supplier.advanceBalance),
+    outstandingBalance: Number(supplier.outstandingBalance),
+  };
+
+  const ledger = supplier.ledgerEntries.map(e => ({
+    id: e.id,
+    entryDate: e.entryDate.toISOString(),
+    reference: e.reference,
+    description: e.description,
+    debit: Number(e.debit),
+    credit: Number(e.credit),
+    balanceAfter: Number(e.balanceAfter),
+  }));
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -36,7 +59,7 @@ export default async function SupplierLedgerPage({ params }: Props) {
         </Link>
         <div className="flex items-center gap-2">
           <PaySupplierModal
-            supplier={{ id: supplier.id, name: supplier.name, outstandingBalance: supplier.outstandingBalance }}
+            supplier={{ id: mappedSupplier.id, name: mappedSupplier.name, outstandingBalance: mappedSupplier.outstandingBalance }}
             buttonLabel="Pay Supplier"
             buttonClassName="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold inline-flex items-center gap-1.5 shadow-2xs transition print:hidden cursor-pointer"
           />
@@ -53,30 +76,30 @@ export default async function SupplierLedgerPage({ params }: Props) {
         <div className="space-y-1.5">
           <div className="inline-flex items-center gap-2">
             <span className="font-mono text-xs font-bold text-purple-600 px-2 py-0.5 bg-purple-50 rounded-md border border-purple-100">
-              {supplier.supplierNumber}
+              {mappedSupplier.supplierNumber}
             </span>
             <span className="text-xs text-slate-400 font-medium">Distributor Statement</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{supplier.name}</h1>
-          {supplier.companyName && (
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{mappedSupplier.name}</h1>
+          {mappedSupplier.companyName && (
             <p className="text-xs text-slate-600 font-medium flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-slate-400" /> {supplier.companyName}
+              <Building2 className="w-3.5 h-3.5 text-slate-400" /> {mappedSupplier.companyName}
             </p>
           )}
           <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1">
-            {supplier.phone && (
+            {mappedSupplier.phone && (
               <span className="flex items-center gap-1 font-mono">
-                <Phone className="w-3 h-3 text-slate-400" /> {supplier.phone}
+                <Phone className="w-3 h-3 text-slate-400" /> {mappedSupplier.phone}
               </span>
             )}
-            {supplier.email && (
+            {mappedSupplier.email && (
               <span className="flex items-center gap-1">
-                <Mail className="w-3 h-3 text-slate-400" /> {supplier.email}
+                <Mail className="w-3 h-3 text-slate-400" /> {mappedSupplier.email}
               </span>
             )}
-            {supplier.address && (
+            {mappedSupplier.address && (
               <span className="flex items-center gap-1">
-                <MapPin className="w-3 h-3 text-slate-400" /> {supplier.address}
+                <MapPin className="w-3 h-3 text-slate-400" /> {mappedSupplier.address}
               </span>
             )}
           </div>
@@ -87,7 +110,7 @@ export default async function SupplierLedgerPage({ params }: Props) {
           <div className="p-4 bg-rose-50/60 border border-rose-100 rounded-xl text-right min-w-[160px]">
             <div className="text-[10px] font-bold uppercase tracking-wider text-rose-700">Total Payable Balance</div>
             <div className="text-xl font-mono font-black text-rose-700 mt-0.5">
-              {formatCurrency(supplier.outstandingBalance)}
+              {formatCurrency(mappedSupplier.outstandingBalance)}
             </div>
             <div className="text-[10px] text-slate-400 mt-0.5 font-medium">Pending to Pay</div>
           </div>

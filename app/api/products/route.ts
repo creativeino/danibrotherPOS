@@ -135,6 +135,44 @@ export async function POST(req: NextRequest) {
       } catch {
         // ignore movement logging failure
       }
+
+      // If a supplier was selected, add the initial stock value to the supplier's payable balance
+      if (data.supplierId) {
+        try {
+          const supplier = await prisma.supplier.findUnique({
+            where: { id: data.supplierId },
+          });
+
+          if (supplier) {
+            const stockCostTotal = Number(data.costPrice) * Number(data.quantityInStock);
+            if (stockCostTotal > 0) {
+              const newBalance = Number(supplier.outstandingBalance) + stockCostTotal;
+
+              await prisma.supplier.update({
+                where: { id: supplier.id },
+                data: {
+                  outstandingBalance: newBalance,
+                  updatedAt: new Date(),
+                },
+              });
+
+              await prisma.supplierLedgerEntry.create({
+                data: {
+                  supplierId: supplier.id,
+                  entryDate: new Date(),
+                  reference: `PRD-${created.sku}`,
+                  description: `Initial Stock Inwards: ${created.name} (${data.quantityInStock} pcs @ Rs. ${data.costPrice})`,
+                  debit: 0,
+                  credit: stockCostTotal,
+                  balanceAfter: newBalance,
+                },
+              });
+            }
+          }
+        } catch (supErr) {
+          console.error('Failed to link supplier stock balance:', supErr);
+        }
+      }
     }
 
     return NextResponse.json({
