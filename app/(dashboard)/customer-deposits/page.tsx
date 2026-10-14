@@ -1,16 +1,33 @@
 import React from 'react';
-import { dbStore } from '@/lib/db';
-import { AccountService } from '@/services/account-service';
+import { prisma } from '@/lib/prisma';
 import { formatCurrency } from '@/lib/calculations';
 import { Wallet } from 'lucide-react';
 import { NewDepositModal } from '@/components/NewDepositModal';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function CustomerDepositsPage() {
-  const state = dbStore.getState();
-  const deposits = [...state.customerDeposits].reverse();
-  const customers = AccountService.getCustomers();
+  const [deposits, rawCustomers] = await Promise.all([
+    prisma.customerDeposit.findMany({
+      include: {
+        customer: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.customer.findMany({
+      orderBy: { name: 'asc' },
+    }),
+  ]);
+
+  const customers = rawCustomers.map(c => ({
+    id: c.id,
+    name: c.name,
+    customerNumber: c.customerNumber,
+    phone: c.phone ?? '',
+    depositBalance: Number(c.depositBalance),
+    outstandingBalance: Number(c.outstandingBalance),
+  }));
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -53,16 +70,16 @@ export default async function CustomerDepositsPage() {
                     <td className="p-3.5 text-slate-500 font-mono">
                       {new Date(d.createdAt).toLocaleString('en-PK')}
                     </td>
-                    <td className="p-3.5 font-bold text-slate-900">{d.customerName}</td>
+                    <td className="p-3.5 font-bold text-slate-900">{d.customer?.name || 'Walk-in'}</td>
                     <td className="p-3.5 text-right font-mono font-bold text-emerald-700">
-                      {formatCurrency(d.amount)}
+                      {formatCurrency(Number(d.amount))}
                     </td>
                     <td className="p-3.5 text-center">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                         {d.paymentMethod}
                       </span>
                     </td>
-                    <td className="p-3.5 text-slate-500">{d.notes || '—'}</td>
+                    <td className="p-3.5 text-slate-500 max-w-xs truncate">{d.notes || '—'}</td>
                   </tr>
                 ))
               )}

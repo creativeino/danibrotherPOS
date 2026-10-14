@@ -1,14 +1,24 @@
 import React from 'react';
-import { dbStore } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { formatCurrency } from '@/lib/calculations';
 import { NewExpenseModal } from '@/components/NewExpenseModal';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function ExpensesPage() {
-  const state = dbStore.getState();
-  const expenses = [...state.expenses].reverse();
-  const categories = state.expenseCategories;
+  const [expenses, categories] = await Promise.all([
+    prisma.expense.findMany({
+      include: {
+        category: true,
+        creator: true,
+      },
+      orderBy: { expenseDate: 'desc' },
+    }),
+    prisma.expenseCategory.findMany({
+      orderBy: { name: 'asc' },
+    }),
+  ]);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -45,27 +55,24 @@ export default async function ExpensesPage() {
                   </td>
                 </tr>
               ) : (
-                expenses.map(e => {
-                  const cat = categories.find(c => c.id === e.expenseCategoryId);
-                  return (
-                    <tr key={e.id} className="hover:bg-slate-50/70 transition">
-                      <td className="p-3.5 font-mono text-purple-600 font-bold">{e.expenseNumber}</td>
-                      <td className="p-3.5 text-slate-500 font-mono">
-                        {new Date(e.expenseDate).toLocaleDateString('en-PK')}
-                      </td>
-                      <td className="p-3.5 font-bold text-slate-900">{cat?.name || 'General'}</td>
-                      <td className="p-3.5 text-slate-600">{e.title}</td>
-                      <td className="p-3.5 text-right font-mono font-bold text-rose-700">
-                        {formatCurrency(e.amount)}
-                      </td>
-                      <td className="p-3.5 text-center">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                          {e.paymentMethod}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })
+                expenses.map(e => (
+                  <tr key={e.id} className="hover:bg-slate-50/70 transition">
+                    <td className="p-3.5 font-mono text-purple-600 font-bold">{e.expenseNumber}</td>
+                    <td className="p-3.5 text-slate-500 font-mono">
+                      {new Date(e.expenseDate).toLocaleDateString('en-PK')}
+                    </td>
+                    <td className="p-3.5 font-bold text-slate-900">{e.category?.name || 'General'}</td>
+                    <td className="p-3.5 text-slate-600">{e.title}</td>
+                    <td className="p-3.5 text-right font-mono font-bold text-rose-700">
+                      {formatCurrency(Number(e.amount))}
+                    </td>
+                    <td className="p-3.5 text-center">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700">
+                        {e.paymentMethod}
+                      </span>
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>

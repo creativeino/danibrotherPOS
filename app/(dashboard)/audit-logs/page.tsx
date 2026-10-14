@@ -1,9 +1,18 @@
 import React from 'react';
-import { dbStore } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { ShieldCheck, History } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function AuditLogsPage() {
-  const logs = [...dbStore.getState().auditLogs].reverse();
+  const logs = await prisma.auditLog.findMany({
+    include: {
+      user: true,
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 100,
+  });
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -23,6 +32,7 @@ export default async function AuditLogsPage() {
               <tr>
                 <th className="p-3.5">Timestamp</th>
                 <th className="p-3.5">Action</th>
+                <th className="p-3.5">User</th>
                 <th className="p-3.5">Entity</th>
                 <th className="p-3.5">Record ID</th>
                 <th className="p-3.5">Audit Payload</th>
@@ -31,7 +41,7 @@ export default async function AuditLogsPage() {
             <tbody className="divide-y divide-slate-100 text-slate-700">
               {logs.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="p-8 text-center text-slate-400 font-medium">
+                  <td colSpan={6} className="p-8 text-center text-slate-400 font-medium">
                     No audit records logged yet.
                   </td>
                 </tr>
@@ -46,9 +56,12 @@ export default async function AuditLogsPage() {
                         {l.action}
                       </span>
                     </td>
+                    <td className="p-3.5 font-medium text-slate-800">
+                      {l.user?.fullName || 'System'}
+                    </td>
                     <td className="p-3.5 font-bold text-slate-900">{l.entityType}</td>
                     <td className="p-3.5 font-mono text-slate-500">{l.entityId || '—'}</td>
-                    <td className="p-3.5 font-mono text-slate-500 max-w-md truncate">
+                    <td className="p-3.5 font-mono text-slate-500 max-w-md truncate" title={l.details || ''}>
                       {l.details || '—'}
                     </td>
                   </tr>
