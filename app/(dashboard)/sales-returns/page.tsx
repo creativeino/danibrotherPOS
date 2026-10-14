@@ -1,25 +1,69 @@
 import React from 'react';
-import { dbStore } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { formatCurrency } from '@/lib/calculations';
 import { NewReturnModal } from '@/components/NewReturnModal';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function SalesReturnsPage() {
-  const state = dbStore.getState();
-  const returns = [...state.salesReturns].reverse();
+  const [rawReturns, rawSales] = await Promise.all([
+    prisma.salesReturn.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        salesInvoice: true,
+        customer: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    }),
+    prisma.salesInvoice.findMany({
+      where: { isVoided: false },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      include: {
+        customer: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    }),
+  ]);
+
+  const returns = rawReturns.map(r => ({
+    id: r.id,
+    returnNumber: r.returnNumber,
+    salesInvoiceId: r.salesInvoiceId,
+    invoiceNumber: r.salesInvoice?.invoiceNumber || '',
+    customerId: r.customerId,
+    customerName: r.customer?.name || r.salesInvoice?.customerName || 'Customer',
+    refundAmount: Number(r.refundAmount),
+    refundMethod: r.refundMethod,
+    reason: r.reason || '',
+    returnDate: r.returnDate.toISOString(),
+  }));
 
   // Attach items to active non-voided sales for the modal
-  const salesWithItems = state.sales
-    .filter(s => !s.isVoided)
-    .map(s => ({
-      id: s.id,
-      invoiceNumber: s.invoiceNumber,
-      customerName: s.customerName,
-      invoiceDate: s.invoiceDate,
-      items: state.saleItems.filter(item => item.salesInvoiceId === s.id),
-    }))
-    .reverse();
+  const salesWithItems = rawSales.map(s => ({
+    id: s.id,
+    invoiceNumber: s.invoiceNumber,
+    customerName: s.customer?.name || s.customerName || 'Walk-in Customer',
+    invoiceDate: s.invoiceDate.toISOString(),
+    items: s.items.map(item => ({
+      id: item.id,
+      productId: item.productId,
+      productName: item.product?.name || 'Item',
+      quantity: item.quantity,
+      unitPrice: Number(item.unitPrice),
+      returnedQuantity: item.returnedQuantity,
+      serialNumbers: item.serialNumbers,
+    })),
+  }));
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -31,7 +75,7 @@ export default async function SalesReturnsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <NewReturnModal invoices={salesWithItems} />
+          <NewReturnModal invoices={salesWithItems as any} />
         </div>
       </div>
 
@@ -63,7 +107,7 @@ export default async function SalesReturnsPage() {
                     <td className="p-3.5 font-mono text-blue-600 font-semibold">
                       {r.invoiceNumber || r.salesInvoiceId}
                     </td>
-                    <td className="p-3.5 font-bold text-slate-900">{r.customerName || 'Customer'}</td>
+                    <td className="p-3.5 font-bold text-slate-900">{r.customerName}</td>
                     <td className="p-3.5 text-slate-500 font-mono">
                       {new Date(r.returnDate).toLocaleString('en-PK')}
                     </td>
