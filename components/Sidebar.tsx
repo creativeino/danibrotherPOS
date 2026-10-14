@@ -75,9 +75,6 @@ export function Sidebar({ currentUser }: SidebarProps) {
             className="h-9 w-auto max-w-[170px] object-contain shrink-0 transition-transform duration-200 group-hover:scale-102"
           />
         </Link>
-        <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-blue-50 text-blue-700 border border-blue-200/60 uppercase tracking-wider">
-          v2.0
-        </span>
       </div>
 
       {/* Navigation Sections */}

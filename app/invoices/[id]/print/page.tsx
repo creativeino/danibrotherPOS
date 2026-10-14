@@ -79,7 +79,7 @@ export default async function InvoicePrintPage({
   const dbSettings = await prisma.shopSettings.findFirst();
   const settings = {
     address: dbSettings?.address ?? 'B-13 Sector Z6 Gulshan-e-Maymar, Karachi',
-    phone: dbSettings?.phone ?? '+92 300 1234567',
+    phone: dbSettings?.phone ?? '+92 333 1360441',
     email: dbSettings?.email ?? 'danibrothers99@gmail.com',
     invoiceFooter: dbSettings?.invoiceFooter ?? 'Thank you for choosing Danibrothers! Warranty claims require original receipt.',
     warrantyPolicy: dbSettings?.warrantyPolicy ?? '7-Day Check Warranty on used laptops/PCs.',

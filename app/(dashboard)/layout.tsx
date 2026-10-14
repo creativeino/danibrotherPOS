@@ -32,9 +32,6 @@ export default async function AppLayout({
               <span className="text-xs font-bold text-slate-800 tracking-wide uppercase">
                 Retail POS & Inventory
               </span>
-              <span className="text-[10px] text-slate-400 hidden md:inline">
-                • Store Management Suite
-              </span>
             </div>
             <span className="text-slate-200 hidden sm:inline">|</span>
             <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50/80 px-2.5 py-1 rounded-full border border-emerald-200/60 flex items-center gap-1.5 shadow-2xs">

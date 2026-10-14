@@ -62,7 +62,7 @@ function getInitialState(): DBState {
       shopName: 'Danibrothers Computers & CCTV',
       logoUrl: null,
       address: 'B-13 Sector Z6 Gulshan-e-Maymar, Karachi',
-      phone: '+92 300 1234567',
+      phone: '+92 333 1360441',
       email: 'danibrothers99@gmail.com',
       currencySymbol: 'Rs.',
       currencyCode: 'PKR',
