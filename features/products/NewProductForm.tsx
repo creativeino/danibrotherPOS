@@ -254,8 +254,7 @@ export function NewProductForm({ categories, brands, suppliers = [] }: Props) {
       setSuccessMsg(`Product "${name}" added successfully! Barcode: ${barcode}`);
       setTimeout(() => {
         router.push('/products');
-        router.refresh();
-      }, 1200);
+      }, 700);
     } catch {
       setErrorMsg('Network error while saving product.');
       setLoading(false);
