@@ -1,11 +1,26 @@
 import React from 'react';
-import { InventoryService } from '@/services/inventory-service';
+import { prisma } from '@/lib/prisma';
 import { BarcodeLabelGrid } from '@/components/BarcodeLabelGrid';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function BarcodesPage() {
-  const products = InventoryService.getProducts();
+  const rawProducts = await prisma.product.findMany({
+    where: { active: true },
+    orderBy: { name: 'asc' },
+  });
+
+  const products = rawProducts.map(p => ({
+    id: p.id,
+    name: p.name,
+    sku: p.sku,
+    barcode: p.barcode,
+    costPrice: Number(p.costPrice),
+    sellingPrice: Number(p.sellingPrice),
+    quantityInStock: p.quantityInStock,
+    unit: p.unit,
+  }));
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -18,7 +33,7 @@ export default async function BarcodesPage() {
         </div>
       </div>
 
-      <BarcodeLabelGrid products={products} />
+      <BarcodeLabelGrid products={products as any} />
     </div>
   );
 }

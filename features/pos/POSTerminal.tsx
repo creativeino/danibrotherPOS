@@ -119,19 +119,71 @@ export function POSTerminal({
     setPaymentReceived(calculation.netAmountDue);
   }, [calculation.netAmountDue]);
 
-  // USB Barcode Scanner Handler
+  const barcodeBufferRef = useRef<string>('');
+  const lastKeyTimeRef = useRef<number>(0);
+
+  // Global USB Barcode Scanner Listener:
+  // Most retail USB / Bluetooth barcode scanners type rapid keystrokes (< 40ms interval) followed by Enter.
+  // This listener ensures that whether the user is clicking somewhere or has focus on another element,
+  // scanning any barcode will immediately detect the code, add the product to cart, and clear buffer.
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept if user is typing in a textarea or standard text input other than barcode search
+      const target = e.target as HTMLElement | null;
+      const isInput = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA');
+
+      if (e.key === 'Enter') {
+        const scannedCode = barcodeBufferRef.current.trim();
+        if (scannedCode.length >= 3) {
+          const matched = products.find(
+            p =>
+              p.barcode.toLowerCase() === scannedCode.toLowerCase() ||
+              p.sku.toLowerCase() === scannedCode.toLowerCase()
+          );
+          if (matched) {
+            e.preventDefault();
+            addProductToCart(matched);
+            setSearchQuery('');
+            barcodeBufferRef.current = '';
+            barcodeInputRef.current?.focus();
+            return;
+          }
+        }
+        barcodeBufferRef.current = '';
+        return;
+      }
+
+      if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        const now = Date.now();
+        // Reset buffer if delay between keystrokes is too long (> 100ms indicates slow human typing)
+        if (now - lastKeyTimeRef.current > 100) {
+          barcodeBufferRef.current = '';
+        }
+        lastKeyTimeRef.current = now;
+        barcodeBufferRef.current += e.key;
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [products]);
+
+  // USB Barcode Scanner Handler via Search input form
   const handleBarcodeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const code = searchQuery.trim();
     if (!code) return;
 
     const matched = products.find(
-      p => p.barcode === code || p.sku.toLowerCase() === code.toLowerCase()
+      p =>
+        p.barcode.toLowerCase() === code.toLowerCase() ||
+        p.sku.toLowerCase() === code.toLowerCase()
     );
 
     if (matched) {
       addProductToCart(matched);
       setSearchQuery('');
+      barcodeInputRef.current?.focus();
     } else {
       setErrorMsg(`Unknown barcode/SKU: "${code}". Register product or check barcode.`);
       setTimeout(() => setErrorMsg(''), 4000);
