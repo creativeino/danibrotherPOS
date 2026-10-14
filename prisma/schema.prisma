@@ -255,6 +255,7 @@ model Supplier {
 model SalesInvoice {
   id                   String              @id @default(cuid())
   invoiceNumber        String              @unique
+  customerName         String              @default("")
   customerId           String?
   cashierId            String
   registerSessionId    String?

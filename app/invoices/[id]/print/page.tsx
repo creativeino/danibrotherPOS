@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { POSService } from '@/services/pos-service';
-import { dbStore } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 import { formatCurrency } from '@/lib/calculations';
 import { PrintButton } from '@/components/PrintButton';
 import { AutoPrint } from '@/components/AutoPrint';
@@ -26,22 +25,76 @@ export default async function InvoicePrintPage({
     // fallback
   }
 
-  let invoice = id ? POSService.getInvoice(id) : null;
-  if (!invoice) {
-    const allSales = [...(dbStore.getState().sales || [])];
-    const latest = allSales[allSales.length - 1];
-    if (latest) {
-      invoice = POSService.getInvoice(latest.id);
+  const include = { items: { include: { product: true } }, cashier: true };
+
+  async function fetchInvoice(idOrNumber: string) {
+    const clean = idOrNumber.replace(/^#/, '').trim();
+    let inv = await prisma.salesInvoice.findUnique({ where: { id: clean }, include });
+    if (!inv) inv = await prisma.salesInvoice.findUnique({ where: { invoiceNumber: clean }, include });
+    if (!inv && /^\d+$/.test(clean)) {
+      const s = await prisma.shopSettings.findFirst();
+      const prefix = s?.invoicePrefix ?? 'INV-';
+      inv = await prisma.salesInvoice.findUnique({ where: { invoiceNumber: `${prefix}${clean.padStart(5, '0')}` }, include });
     }
+    return inv;
   }
 
-  const settings = dbStore.getState().settings;
+  function mapInvoice(inv: any) {
+    return {
+      id: inv.id,
+      invoiceNumber: inv.invoiceNumber,
+      customerName: inv.customerName,
+      cashierName: inv.cashier?.fullName ?? 'Staff',
+      invoiceDate: inv.invoiceDate,
+      subtotal: Number(inv.subtotal),
+      itemDiscountTotal: Number(inv.itemDiscountTotal),
+      invoiceDiscount: Number(inv.invoiceDiscount),
+      taxAmount: Number(inv.taxAmount),
+      grandTotal: Number(inv.grandTotal),
+      customerAdvanceUsed: Number(inv.customerAdvanceUsed),
+      netAmountDue: Number(inv.netAmountDue),
+      paymentReceived: Number(inv.paymentReceived),
+      remainingBalance: Number(inv.remainingBalance),
+      paymentMethod: inv.paymentMethod,
+      notes: inv.notes,
+      isVoided: inv.isVoided,
+      items: (inv.items ?? []).map((item: any) => ({
+        productName: (item.serviceNotes && (!item.product || item.product.sku === 'SRV-LABOR'))
+          ? item.serviceNotes
+          : (item.product?.name ?? item.serviceNotes ?? 'Service'),
+        quantity: item.quantity,
+        unitPrice: Number(item.unitPrice),
+        lineDiscount: Number(item.lineDiscount),
+        lineTotal: Number(item.lineTotal),
+        serialNumbers: item.serialNumbers ?? null,
+        serviceNotes: item.serviceNotes ?? null,
+      })),
+    };
+  }
+
+  const rawInvoice = id ? await fetchInvoice(id) : null;
+  const invoice = rawInvoice ? mapInvoice(rawInvoice) : null;
+
+  const dbSettings = await prisma.shopSettings.findFirst();
+  const settings = {
+    address: dbSettings?.address ?? 'B-13 Sector Z6 Gulshan-e-Maymar, Karachi',
+    phone: dbSettings?.phone ?? '+92 300 1234567',
+    email: dbSettings?.email ?? 'danibrothers99@gmail.com',
+    invoiceFooter: dbSettings?.invoiceFooter ?? 'Thank you for choosing Danibrothers! Warranty claims require original receipt.',
+    warrantyPolicy: dbSettings?.warrantyPolicy ?? '7-Day Check Warranty on used laptops/PCs.',
+  };
+
   const noAutoPrint = resolvedSearchParams?.autoprint === 'false';
-  const sizeParam = resolvedSearchParams?.size === '80mm' ? '80mm' : '58mm'; // Default to compact 58mm POS thermal receipt
+  const sizeParam = resolvedSearchParams?.size === '80mm' ? '80mm' : '58mm';
 
   if (!invoice) {
-    const allSales = [...(dbStore.getState().sales || [])].reverse();
-    const latestInvoice = allSales[0];
+    const latestRaw = await prisma.salesInvoice.findFirst({ orderBy: { createdAt: 'desc' } });
+    const latestInvoice = latestRaw ? {
+      id: latestRaw.id,
+      invoiceNumber: latestRaw.invoiceNumber,
+      customerName: latestRaw.customerName,
+      grandTotal: Number(latestRaw.grandTotal),
+    } : null;
 
     return (
       <div className="min-h-screen bg-slate-50 text-slate-800 p-6 flex flex-col items-center justify-center font-sans">
@@ -168,7 +221,7 @@ export default async function InvoicePrintPage({
           </div>
           <div className="divide-y divide-dashed divide-gray-300 pt-1">
             {invoice.items && invoice.items.length > 0 ? (
-              invoice.items.map((item, idx) => (
+              invoice.items.map((item: any, idx: number) => (
                 <div key={idx} className="py-1 text-[9.5px]">
                   <div className="font-bold leading-tight break-words">{item.productName}</div>
                   {item.serviceNotes && (
