@@ -172,6 +172,7 @@ model Product {
   movements          InventoryMovement[]
   adjustments        StockAdjustmentItem[]
   returnItems        SalesReturnItem[]
+  purchaseReturnItems PurchaseReturnItem[]
 
   @@index([barcode])
   @@index([sku])
@@ -244,6 +245,7 @@ model Supplier {
   updatedAt           DateTime           @updatedAt
 
   purchases           PurchaseInvoice[]
+  purchaseReturns     PurchaseReturn[]
   advances            SupplierAdvance[]
   ledgerEntries       SupplierLedgerEntry[]
 
@@ -335,6 +337,7 @@ model PurchaseInvoice {
   supplier             Supplier              @relation(fields: [supplierId], references: [id], onDelete: Restrict)
   creator              User                  @relation(fields: [creatorId], references: [id], onDelete: Restrict)
   items                PurchaseInvoiceItem[]
+  returns              PurchaseReturn[]
   serials              ProductSerialNumber[]
 
   @@index([purchaseNumber])
@@ -463,6 +466,44 @@ model SalesReturnItem {
   @@index([salesReturnId])
   @@index([productId])
 }
+
+model PurchaseReturn {
+  id                 String               @id @default(cuid())
+  returnNumber       String               @unique
+  purchaseInvoiceId  String?
+  supplierId         String
+  returnDate         DateTime             @default(now())
+  totalAmount        Decimal              @default(0.0) @db.Decimal(12, 2)
+  reason             String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  purchaseInvoice    PurchaseInvoice?     @relation(fields: [purchaseInvoiceId], references: [id], onDelete: SetNull)
+  supplier           Supplier             @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  items              PurchaseReturnItem[]
+
+  @@index([returnNumber])
+  @@index([supplierId])
+  @@index([purchaseInvoiceId])
+}
+
+model PurchaseReturnItem {
+  id                 String          @id @default(cuid())
+  purchaseReturnId   String
+  productId          String
+  quantity           Int
+  unitCost           Decimal         @db.Decimal(12, 2)
+  totalCost          Decimal         @db.Decimal(12, 2)
+  notes              String?
+  createdAt          DateTime        @default(now())
+
+  purchaseReturn     PurchaseReturn  @relation(fields: [purchaseReturnId], references: [id], onDelete: Cascade)
+  product            Product         @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([purchaseReturnId])
+  @@index([productId])
+}
+
 
 model InventoryMovement {
   id             String       @id @default(cuid())

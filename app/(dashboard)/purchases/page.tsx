@@ -1,18 +1,59 @@
 import React from 'react';
-import { PurchaseService } from '@/services/purchase-service';
-import { AccountService } from '@/services/account-service';
-import { InventoryService } from '@/services/inventory-service';
+import { prisma } from '@/lib/prisma';
 import { formatCurrency } from '@/lib/calculations';
-import { Truck, Plus, FileText } from 'lucide-react';
-import Link from 'next/link';
 import { NewPurchaseModal } from '@/components/NewPurchaseModal';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function PurchasesPage() {
-  const purchases = PurchaseService.getPurchases();
-  const suppliers = AccountService.getSuppliers();
-  const products = InventoryService.getProducts();
+  const [rawPurchases, rawSuppliers, rawProducts] = await Promise.all([
+    prisma.purchaseInvoice.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        supplier: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    }),
+    prisma.supplier.findMany({
+      orderBy: { name: 'asc' },
+    }),
+    prisma.product.findMany({
+      where: { active: true },
+      orderBy: { name: 'asc' },
+    }),
+  ]);
+
+  const purchases = rawPurchases.map(p => ({
+    id: p.id,
+    purchaseNumber: p.purchaseNumber,
+    supplierName: p.supplier?.name || 'Supplier',
+    purchaseDate: p.purchaseDate.toISOString(),
+    grandTotal: Number(p.grandTotal),
+    supplierAdvanceUsed: Number(p.supplierAdvanceUsed),
+    amountPaid: Number(p.amountPaid),
+    remainingBalance: Number(p.remainingBalance),
+    paymentStatus: p.paymentStatus,
+  }));
+
+  const suppliers = rawSuppliers.map(s => ({
+    id: s.id,
+    name: s.name,
+    companyName: s.companyName,
+  }));
+
+  const products = rawProducts.map(p => ({
+    id: p.id,
+    name: p.name,
+    sku: p.sku,
+    costPrice: Number(p.costPrice),
+    sellingPrice: Number(p.sellingPrice),
+    quantityInStock: p.quantityInStock,
+  }));
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -24,7 +65,7 @@ export default async function PurchasesPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <NewPurchaseModal suppliers={suppliers} products={products} />
+          <NewPurchaseModal suppliers={suppliers} products={products as any} />
         </div>
       </div>
 
