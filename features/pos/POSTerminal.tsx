@@ -24,6 +24,7 @@ import {
   Wrench,
   X,
   ShoppingBag,
+  ShoppingCart,
   Sparkles,
   Receipt,
   Banknote,
@@ -54,6 +55,7 @@ export function POSTerminal({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [viewMode, setViewMode] = useState<'GRID' | 'LIST'>('LIST');
+  const [activeMobileTab, setActiveMobileTab] = useState<'catalog' | 'cart'>('catalog');
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
   const [customerName, setCustomerName] = useState<string>('');
   const [customerPhone, setCustomerPhone] = useState<string>('');
@@ -483,12 +485,49 @@ export function POSTerminal({
   });
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-6.2rem)]">
+    <div className="flex flex-col lg:flex-row gap-3 lg:gap-4 h-[calc(100dvh-5.5rem)] lg:h-[calc(100vh-6.2rem)] relative">
+      {/* Mobile Tab Switcher (Visible on < lg screens) */}
+      <div className="lg:hidden flex items-center bg-white border border-slate-200/90 rounded-2xl p-1 shadow-xs shrink-0">
+        <button
+          type="button"
+          onClick={() => setActiveMobileTab('catalog')}
+          className={`flex-1 py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer ${
+            activeMobileTab === 'catalog'
+              ? 'bg-blue-600 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+          }`}
+        >
+          <ShoppingBag className="w-4 h-4" />
+          <span>Product Catalog</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveMobileTab('cart')}
+          className={`flex-1 py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer relative ${
+            activeMobileTab === 'cart'
+              ? 'bg-blue-600 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+          }`}
+        >
+          <ShoppingCart className="w-4 h-4" />
+          <span>Checkout & Cart</span>
+          {cart.length > 0 && (
+            <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+              activeMobileTab === 'cart' ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'
+            }`}>
+              {cart.reduce((a, c) => a + c.quantity, 0)} • {formatCurrency(calculation.netAmountDue)}
+            </span>
+          )}
+        </button>
+      </div>
+
       {/* Left Area: Product Catalog & Scanner */}
-      <div className="flex-1 flex flex-col bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden">
+      <div className={`flex-1 flex flex-col bg-white border border-slate-200/90 rounded-2xl shadow-xs overflow-hidden min-h-0 ${
+        activeMobileTab === 'catalog' ? 'flex' : 'hidden lg:flex'
+      }`}>
         {/* Scanner & Quick Search Bar with Live Instant Auto-Add Dropdown */}
-        <div className="px-4 py-3 border-b border-slate-100 bg-linear-to-r from-slate-50 via-white to-slate-50 flex items-center gap-3 shrink-0 relative">
-          <div className="flex-1 relative">
+        <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-slate-100 bg-linear-to-r from-slate-50 via-white to-slate-50 flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-3 shrink-0 relative">
+          <div className="flex-1 min-w-[200px] relative">
             <form onSubmit={handleBarcodeSubmit}>
               <Barcode className="w-5 h-5 text-blue-600 absolute left-3.5 top-2.5 transition group-focus-within:text-blue-700 pointer-events-none" />
               <input
@@ -870,7 +909,9 @@ export function POSTerminal({
       </div>
 
       {/* Right Column: Checkout Billing Panel */}
-      <div className="w-full lg:w-[460px] bg-white border border-slate-200/90 rounded-2xl flex flex-col shadow-xs overflow-hidden shrink-0">
+      <div className={`w-full lg:w-[460px] bg-white border border-slate-200/90 rounded-2xl flex flex-col shadow-xs overflow-hidden shrink-0 min-h-0 ${
+        activeMobileTab === 'cart' ? 'flex' : 'hidden lg:flex'
+      }`}>
         {/* Customer Header & Details */}
         <div className="p-3 border-b border-slate-100 bg-slate-50/60 space-y-2">
           <div className="flex items-center justify-between">

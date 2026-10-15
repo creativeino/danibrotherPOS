@@ -59,7 +59,7 @@ export default async function POSPage() {
   const categories = rawCategories.map(c => ({ id: c.id, name: c.name }));
 
   return (
-    <div className="h-full w-full -m-6 p-4 bg-slate-100/70">
+    <div className="h-full w-full -m-3 sm:-m-5 lg:-m-6 p-2 sm:p-4 bg-slate-100/70">
       <POSTerminal
         initialProducts={products as any}
         customers={customers as any}

@@ -16,6 +16,7 @@ interface Props {
   allSuppliers?: SupplierOption[];
   buttonClassName?: string;
   buttonLabel?: string;
+  onPaymentSuccess?: (supplierId: string, newBalance: number) => void;
 }
 
 export function PaySupplierModal({
@@ -23,6 +24,7 @@ export function PaySupplierModal({
   allSuppliers = [],
   buttonClassName,
   buttonLabel = 'Pay Supplier',
+  onPaymentSuccess,
 }: Props) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -92,10 +94,14 @@ export function PaySupplierModal({
       }
 
       setSuccessMsg(`Payment of ${formatCurrency(payNum)} successfully recorded!`);
+      const newBal = data.supplier?.outstandingBalance ?? Math.max(0, (activeSupplier?.outstandingBalance ?? 0) - payNum);
+      if (onPaymentSuccess) {
+        onPaymentSuccess(targetId, newBal);
+      }
       setTimeout(() => {
         setIsOpen(false);
         router.refresh();
-      }, 800);
+      }, 700);
     } catch {
       setErrorMsg('Network error while processing payment.');
       setLoading(false);
@@ -116,8 +122,8 @@ export function PaySupplierModal({
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150 overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-150 my-auto">
             {/* Header */}
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
               <div className="flex items-center gap-2.5">

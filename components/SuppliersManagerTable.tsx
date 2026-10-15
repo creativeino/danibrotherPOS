@@ -26,6 +26,10 @@ export function SuppliersManagerTable({ initialSuppliers }: Props) {
   const router = useRouter();
   const [suppliers, setSuppliers] = useState<SupplierItem[]>(initialSuppliers);
 
+  React.useEffect(() => {
+    setSuppliers(initialSuppliers);
+  }, [initialSuppliers]);
+
   // Edit State
   const [editingSupplier, setEditingSupplier] = useState<SupplierItem | null>(null);
   const [editName, setEditName] = useState('');
@@ -161,6 +165,11 @@ export function SuppliersManagerTable({ initialSuppliers }: Props) {
                         <PaySupplierModal
                           supplier={{ id: s.id, name: s.name, outstandingBalance: s.outstandingBalance }}
                           buttonLabel="Pay"
+                          onPaymentSuccess={(supplierId, newBalance) => {
+                            setSuppliers(prev =>
+                              prev.map(item => (item.id === supplierId ? { ...item, outstandingBalance: newBalance } : item))
+                            );
+                          }}
                           buttonClassName="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-semibold shadow-2xs transition inline-flex items-center gap-1 cursor-pointer"
                         />
 
@@ -201,8 +210,8 @@ export function SuppliersManagerTable({ initialSuppliers }: Props) {
 
       {/* Edit Supplier Modal */}
       {editingSupplier && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 text-slate-900 shadow-2xl border border-slate-200 space-y-4">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto p-4 sm:p-6 text-slate-900 shadow-2xl border border-slate-200 space-y-4 my-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 shrink-0">
@@ -316,8 +325,8 @@ export function SuppliersManagerTable({ initialSuppliers }: Props) {
 
       {/* Delete Confirmation Modal */}
       {deletingSupplier && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 text-slate-900 shadow-2xl border border-slate-200 space-y-4">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-sm w-full max-h-[90vh] overflow-y-auto p-4 sm:p-6 text-slate-900 shadow-2xl border border-slate-200 space-y-4 my-auto">
             <div className="w-11 h-11 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center mx-auto border border-rose-100">
               <AlertTriangle className="w-6 h-6" />
             </div>

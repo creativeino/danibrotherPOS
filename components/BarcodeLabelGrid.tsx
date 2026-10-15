@@ -238,19 +238,19 @@ export function BarcodeLabelGrid({ products }: Props) {
         </div>
 
         {/* Options Toolbar: Size, Copies, Print */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100">
           {/* Sticker Size */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
+          <div className="flex flex-col xs:flex-row xs:items-center gap-2">
+            <span className="text-xs font-bold text-slate-600 flex items-center gap-1.5 shrink-0">
               <Sliders className="w-3.5 h-3.5 text-blue-600" /> Size:
             </span>
-            <div className="inline-flex rounded-xl p-1 bg-slate-100 border border-slate-200 text-xs">
+            <div className="inline-flex flex-wrap rounded-xl p-1 bg-slate-100 border border-slate-200 text-xs">
               {(['mini', 'small', 'standard'] as StickerSize[]).map(s => (
                 <button
                   key={s}
                   type="button"
                   onClick={() => setSize(s)}
-                  className={`px-3 py-1 rounded-lg font-bold transition cursor-pointer ${
+                  className={`px-2.5 sm:px-3 py-1 rounded-lg font-bold transition cursor-pointer text-[11px] sm:text-xs ${
                     size === s
                       ? 'bg-white text-blue-600 shadow-2xs'
                       : 'text-slate-600 hover:text-slate-900'
@@ -265,7 +265,7 @@ export function BarcodeLabelGrid({ products }: Props) {
           </div>
 
           {/* Number of Copies & Print Action */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between sm:justify-end gap-3">
             <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
               <span>Copies:</span>
               <input
@@ -281,9 +281,9 @@ export function BarcodeLabelGrid({ products }: Props) {
             <button
               onClick={() => window.print()}
               disabled={!activeProduct}
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-xs transition cursor-pointer"
+              className="px-4 sm:px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-xs transition cursor-pointer"
             >
-              <Printer className="w-4 h-4" /> Print Barcode Label ({printableList.length})
+              <Printer className="w-4 h-4" /> Print Labels ({printableList.length})
             </button>
           </div>
         </div>
