@@ -146,3 +146,63 @@ export function formatCurrency(
     maximumFractionDigits: 2,
   })}`;
 }
+
+/**
+ * Standard Karachi Timezone (Asia/Karachi - UTC+5) Date and Time Formatter
+ */
+export function formatDateTimePK(
+  dateInput: Date | string | number | null | undefined,
+  options?: { includeSeconds?: boolean; dateStyle?: 'short' | 'medium' | 'long' }
+): string {
+  if (!dateInput) return '-';
+  const d = typeof dateInput === 'object' && dateInput instanceof Date ? dateInput : new Date(dateInput);
+  if (isNaN(d.getTime())) return '-';
+
+  return d.toLocaleString('en-PK', {
+    timeZone: 'Asia/Karachi',
+    year: 'numeric',
+    month: options?.dateStyle === 'long' ? 'long' : (options?.dateStyle === 'medium' ? 'short' : '2-digit'),
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    ...(options?.includeSeconds ? { second: '2-digit' } : {}),
+    hour12: true,
+  });
+}
+
+/**
+ * Karachi Date only formatter (DD/MM/YYYY)
+ */
+export function formatDatePK(dateInput: Date | string | number | null | undefined): string {
+  if (!dateInput) return '-';
+  const d = typeof dateInput === 'object' && dateInput instanceof Date ? dateInput : new Date(dateInput);
+  if (isNaN(d.getTime())) return '-';
+
+  return d.toLocaleDateString('en-PK', {
+    timeZone: 'Asia/Karachi',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+}
+
+/**
+ * Karachi Time only formatter (hh:mm AM/PM)
+ */
+export function formatTimePK(
+  dateInput: Date | string | number | null | undefined,
+  includeSeconds = false
+): string {
+  if (!dateInput) return '-';
+  const d = typeof dateInput === 'object' && dateInput instanceof Date ? dateInput : new Date(dateInput);
+  if (isNaN(d.getTime())) return '-';
+
+  return d.toLocaleTimeString('en-PK', {
+    timeZone: 'Asia/Karachi',
+    hour: '2-digit',
+    minute: '2-digit',
+    ...(includeSeconds ? { second: '2-digit' } : {}),
+    hour12: true,
+  });
+}
+

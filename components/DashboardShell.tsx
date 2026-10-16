@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Sidebar } from '@/components/Sidebar';
+import { KarachiClock } from '@/components/KarachiClock';
 import { UserSession } from '@/types/pos';
 import { Menu } from 'lucide-react';
 
@@ -54,6 +55,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
           </div>
 
           <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
+            <KarachiClock />
             <div className="text-right hidden sm:block">
               <p className="text-xs font-bold text-slate-800 leading-tight">{user.fullName}</p>
               <p className="text-[10px] font-extrabold text-blue-600 uppercase tracking-wider">

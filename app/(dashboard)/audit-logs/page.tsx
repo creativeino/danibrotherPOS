@@ -1,5 +1,6 @@
 import React from 'react';
 import { prisma } from '@/lib/prisma';
+import { formatDateTimePK } from '@/lib/calculations';
 import { ShieldCheck, History } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -49,7 +50,7 @@ export default async function AuditLogsPage() {
                 logs.map(l => (
                   <tr key={l.id} className="hover:bg-slate-50/70 transition">
                     <td className="p-3.5 font-mono text-slate-500">
-                      {new Date(l.createdAt).toLocaleString('en-PK')}
+                      {formatDateTimePK(l.createdAt)}
                     </td>
                     <td className="p-3.5">
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 font-mono">

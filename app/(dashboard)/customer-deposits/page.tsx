@@ -1,6 +1,6 @@
 import React from 'react';
 import { prisma } from '@/lib/prisma';
-import { formatCurrency } from '@/lib/calculations';
+import { formatCurrency, formatDateTimePK } from '@/lib/calculations';
 import { Wallet } from 'lucide-react';
 import { NewDepositModal } from '@/components/NewDepositModal';
 
@@ -68,7 +68,7 @@ export default async function CustomerDepositsPage() {
                   <tr key={d.id} className="hover:bg-slate-50/70 transition">
                     <td className="p-3.5 font-mono text-emerald-700 font-bold">{d.receiptNumber}</td>
                     <td className="p-3.5 text-slate-500 font-mono">
-                      {new Date(d.createdAt).toLocaleString('en-PK')}
+                      {formatDateTimePK(d.createdAt)}
                     </td>
                     <td className="p-3.5 font-bold text-slate-900">{d.customer?.name || 'Walk-in'}</td>
                     <td className="p-3.5 text-right font-mono font-bold text-emerald-700">

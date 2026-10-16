@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { formatCurrency } from '@/lib/calculations';
+import { formatCurrency, formatDateTimePK } from '@/lib/calculations';
 import { Pencil, Trash2, X, Loader2, AlertTriangle, CheckCircle, Search } from 'lucide-react';
 
 export interface SalesReturnRow {
@@ -168,7 +168,7 @@ export function SalesReturnsTable({ initialReturns }: Props) {
                     </td>
                     <td className="p-3.5 font-bold text-slate-900">{r.customerName}</td>
                     <td className="p-3.5 text-slate-500 font-mono text-[11px]">
-                      {new Date(r.returnDate).toLocaleString('en-PK')}
+                      {formatDateTimePK(r.returnDate)}
                     </td>
                     <td className="p-3.5 text-slate-600 max-w-[200px] truncate">{r.reason || 'Customer request'}</td>
                     <td className="p-3.5 text-right font-mono font-bold text-rose-700">

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { formatCurrency } from '@/lib/calculations';
+import { formatCurrency, formatDateTimePK, formatDatePK } from '@/lib/calculations';
 import {
   Calendar,
   DollarSign,
@@ -215,8 +215,8 @@ export function FinancialReportsDashboard({ initialValuation }: Props) {
           </div>
           {reportData && (
             <span className="text-slate-400 font-mono text-[10px]">
-              {new Date(reportData.startDate).toLocaleDateString('en-PK')} &rarr;{' '}
-              {new Date(reportData.endDate).toLocaleDateString('en-PK')}
+              {formatDatePK(reportData.startDate)} &rarr;{' '}
+              {formatDatePK(reportData.endDate)}
             </span>
           )}
         </div>
@@ -383,7 +383,7 @@ export function FinancialReportsDashboard({ initialValuation }: Props) {
                     <tr key={s.id} className="hover:bg-blue-50/30 transition-colors">
                       <td className="py-2 px-3 font-mono text-blue-600 font-bold">{s.invoiceNumber}</td>
                       <td className="py-2 px-3 text-slate-500 font-mono text-[11px]">
-                        {new Date(s.invoiceDate).toLocaleString('en-PK', { dateStyle: 'short', timeStyle: 'short' })}
+                        {formatDateTimePK(s.invoiceDate)}
                       </td>
                       <td className="py-2 px-3 font-bold text-slate-900">{s.customerName}</td>
                       <td className="py-2 px-3 text-right font-mono font-bold text-slate-900">

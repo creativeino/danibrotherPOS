@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
-import { formatCurrency } from '@/lib/calculations';
+import { formatCurrency, formatDateTimePK, formatDatePK, formatTimePK } from '@/lib/calculations';
 import { PrintButton } from '@/components/PrintButton';
 import { AutoPrint } from '@/components/AutoPrint';
 import { ArrowLeft, ShoppingBag, FileText, AlertCircle, Printer } from 'lucide-react';
@@ -222,7 +222,7 @@ export default async function InvoicePrintPage({
           <div className="flex justify-between">
             <span className="font-semibold">DATE & TIME:</span>
             <span className="font-medium">
-              {new Date(invoice.invoiceDate).toLocaleDateString('en-PK')} {new Date(invoice.invoiceDate).toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit' })}
+              {formatDateTimePK(invoice.invoiceDate)}
             </span>
           </div>
           <div className="flex justify-between">

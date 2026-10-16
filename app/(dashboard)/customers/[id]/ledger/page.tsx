@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { AccountService } from '@/services/account-service';
-import { formatCurrency } from '@/lib/calculations';
+import { formatCurrency, formatDateTimePK } from '@/lib/calculations';
 import { ArrowLeft, User, Phone, Mail, MapPin } from 'lucide-react';
 import { PrintButton } from '@/components/PrintButton';
 
@@ -115,7 +115,7 @@ export default async function CustomerLedgerPage({ params }: Props) {
                 ledger.map(entry => (
                   <tr key={entry.id} className="hover:bg-slate-50/70 transition">
                     <td className="p-3.5 font-mono text-slate-500">
-                      {new Date(entry.entryDate).toLocaleString('en-PK')}
+                      {formatDateTimePK(entry.entryDate)}
                     </td>
                     <td className="p-3.5 font-mono font-bold text-blue-600">{entry.reference}</td>
                     <td className="p-3.5 font-medium text-slate-800">{entry.description}</td>

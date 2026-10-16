@@ -1,6 +1,6 @@
 import React from 'react';
 import { prisma } from '@/lib/prisma';
-import { formatCurrency } from '@/lib/calculations';
+import { formatCurrency, formatDatePK } from '@/lib/calculations';
 import { NewExpenseModal } from '@/components/NewExpenseModal';
 
 export const dynamic = 'force-dynamic';
@@ -59,7 +59,7 @@ export default async function ExpensesPage() {
                   <tr key={e.id} className="hover:bg-slate-50/70 transition">
                     <td className="p-3.5 font-mono text-purple-600 font-bold">{e.expenseNumber}</td>
                     <td className="p-3.5 text-slate-500 font-mono">
-                      {new Date(e.expenseDate).toLocaleDateString('en-PK')}
+                      {formatDatePK(e.expenseDate)}
                     </td>
                     <td className="p-3.5 font-bold text-slate-900">{e.category?.name || 'General'}</td>
                     <td className="p-3.5 text-slate-600">{e.title}</td>

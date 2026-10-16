@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { RotateCcw, X, Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
+import { formatDatePK } from '@/lib/calculations';
 
 interface SalesInvoiceSummary {
   id: string;
@@ -175,7 +176,7 @@ export function NewReturnModal({ invoices }: Props) {
                 >
                   {invoices.map(inv => (
                     <option key={inv.id} value={inv.id}>
-                      {inv.invoiceNumber} — {inv.customerName} ({new Date(inv.invoiceDate).toLocaleDateString('en-PK')})
+                      {inv.invoiceNumber} — {inv.customerName} ({formatDatePK(inv.invoiceDate)})
                     </option>
                   ))}
                 </select>

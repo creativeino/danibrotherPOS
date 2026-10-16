@@ -1,6 +1,6 @@
 import React from 'react';
 import { prisma } from '@/lib/prisma';
-import { formatCurrency } from '@/lib/calculations';
+import { formatCurrency, formatDatePK } from '@/lib/calculations';
 import { NewPurchaseModal } from '@/components/NewPurchaseModal';
 
 export const dynamic = 'force-dynamic';
@@ -97,7 +97,7 @@ export default async function PurchasesPage() {
                     <td className="p-3.5 font-mono text-blue-600 font-bold">{p.purchaseNumber}</td>
                     <td className="p-3.5 font-bold text-slate-900">{p.supplierName}</td>
                     <td className="p-3.5 text-slate-500 font-mono">
-                      {new Date(p.purchaseDate).toLocaleDateString('en-PK')}
+                      {formatDatePK(p.purchaseDate)}
                     </td>
                     <td className="p-3.5 text-right font-mono font-bold text-slate-900">
                       {formatCurrency(p.grandTotal)}

@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import { formatCurrency } from '@/lib/calculations';
+import { formatCurrency, formatDateTimePK } from '@/lib/calculations';
 import { ArrowLeft, Building2, Phone, Mail, MapPin } from 'lucide-react';
 import { PrintButton } from '@/components/PrintButton';
 import { PaySupplierModal } from '@/components/PaySupplierModal';
@@ -151,7 +151,7 @@ export default async function SupplierLedgerPage({ params }: Props) {
                 ledger.map(entry => (
                   <tr key={entry.id} className="hover:bg-slate-50/70 transition">
                     <td className="p-3.5 font-mono text-slate-500">
-                      {new Date(entry.entryDate).toLocaleString('en-PK')}
+                      {formatDateTimePK(entry.entryDate)}
                     </td>
                     <td className="p-3.5 font-mono font-bold text-purple-600">{entry.reference}</td>
                     <td className="p-3.5 font-medium text-slate-800">{entry.description}</td>

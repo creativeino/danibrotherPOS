@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { formatCurrency } from '@/lib/calculations';
+import { formatCurrency, formatDateTimePK } from '@/lib/calculations';
 import { Printer, Pencil, Trash2, X, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -173,7 +173,7 @@ export function InvoicesTable({ invoices: initialInvoices }: Props) {
                   <tr key={s.id} className="hover:bg-blue-50/30 transition-colors">
                     <td className="py-2 px-3 font-mono text-blue-600 font-bold">{s.invoiceNumber}</td>
                     <td className="py-2 px-3 text-slate-500 font-mono text-[11px] whitespace-nowrap">
-                      {new Date(s.invoiceDate).toLocaleString('en-PK', { dateStyle: 'short', timeStyle: 'short' })}
+                      {formatDateTimePK(s.invoiceDate)}
                     </td>
                     <td className="py-2 px-3 font-bold text-slate-900 truncate max-w-[160px]">{s.customerName}</td>
                     <td className="py-2 px-3 text-slate-500 whitespace-nowrap">{s.cashierName}</td>
